@@ -1,0 +1,133 @@
+import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
+
+const NAMESPACE = "https://pizza42.com";
+
+const getTierColor = (tier: string) => {
+  switch (tier) {
+    case "gold": return "#FFD700";
+    case "silver": return "#C0C0C0";
+    case "bronze": return "#CD7F32";
+    default: return "#6b7280";
+  }
+};
+
+const ProfilePage = () => {
+  const { user } = useAuth0();
+
+  if (!user) return null;
+
+  // Get custom claims from ID token
+  const totalOrders = user[`${NAMESPACE}/total_orders`] as number || 0;
+  const customerTier = user[`${NAMESPACE}/customer_tier`] as string || "new";
+  const orderHistory = user[`${NAMESPACE}/order_history`] as Array<{
+    orderId: string;
+    pizza: string;
+    total: number;
+    orderedAt: string;
+    status: string;
+  }> || [];
+
+  return (
+    <div className="profile-page">
+      <h1>Profile</h1>
+
+      <div className="profile-card">
+        <img src={user.picture} alt={user.name} className="profile-avatar" />
+        <div className="profile-info">
+          <h2>{user.name}</h2>
+          <p className="profile-email">
+            {user.email}
+            {user.email_verified ? (
+              <span className="badge badge-success">Verified</span>
+            ) : (
+              <span className="badge badge-warning">Not Verified</span>
+            )}
+          </p>
+        </div>
+      </div>
+
+      <div className="profile-section">
+        <h3>Customer Status</h3>
+        <div className="details-grid">
+          <div className="detail-item">
+            <span className="detail-label">Customer Tier</span>
+            <span
+              className="detail-value"
+              style={{
+                color: getTierColor(customerTier),
+                fontWeight: 700,
+                textTransform: "uppercase"
+              }}
+            >
+              {customerTier === "new" ? "🆕 New Customer" :
+               customerTier === "bronze" ? "🥉 Bronze" :
+               customerTier === "silver" ? "🥈 Silver" :
+               customerTier === "gold" ? "🥇 Gold" : customerTier}
+            </span>
+          </div>
+          <div className="detail-item">
+            <span className="detail-label">Total Orders</span>
+            <span className="detail-value">{totalOrders}</span>
+          </div>
+          <div className="detail-item">
+            <span className="detail-label">Next Tier</span>
+            <span className="detail-value">
+              {customerTier === "new" && "1 order for Bronze"}
+              {customerTier === "bronze" && `${5 - totalOrders} orders for Silver`}
+              {customerTier === "silver" && `${10 - totalOrders} orders for Gold`}
+              {customerTier === "gold" && "🎉 Max tier reached!"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {orderHistory.length > 0 && (
+        <div className="profile-section">
+          <h3>Recent Orders (from ID Token)</h3>
+          <div className="mini-orders-list">
+            {orderHistory.slice(0, 5).map((order) => (
+              <div key={order.orderId} className="mini-order-item">
+                <span className="mini-order-pizza">{order.pizza}</span>
+                <span className="mini-order-total">${order.total?.toFixed(2)}</span>
+                <span className="mini-order-date">
+                  {new Date(order.orderedAt).toLocaleDateString()}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="profile-section">
+        <h3>Account Details</h3>
+        <div className="details-grid">
+          <div className="detail-item">
+            <span className="detail-label">Nickname</span>
+            <span className="detail-value">{user.nickname || "N/A"}</span>
+          </div>
+          <div className="detail-item">
+            <span className="detail-label">User ID</span>
+            <span className="detail-value">{user.sub}</span>
+          </div>
+          <div className="detail-item">
+            <span className="detail-label">Last Updated</span>
+            <span className="detail-value">
+              {user.updated_at ? new Date(user.updated_at).toLocaleString() : "N/A"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="profile-section">
+        <h3>ID Token Claims</h3>
+        <div className="token-display">
+          <pre>{JSON.stringify(user, null, 2)}</pre>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default withAuthenticationRequired(ProfilePage, {
+  onRedirecting: () => <div className="loading">Redirecting to login...</div>,
+});
