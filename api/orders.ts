@@ -94,6 +94,13 @@ async function getUser(userId: string) {
       headers: { Authorization: `Bearer ${token}` },
     }
   );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Failed to fetch user:', response.status, errorText);
+    throw new Error(`Failed to fetch user: ${response.status}`);
+  }
+
   return response.json();
 }
 
@@ -111,6 +118,13 @@ async function updateUserMetadata(userId: string, metadata: Record<string, unkno
       body: JSON.stringify({ user_metadata: metadata }),
     }
   );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('Failed to update user metadata:', response.status, errorText);
+    throw new Error(`Failed to update user metadata: ${response.status}`);
+  }
+
   return response.json();
 }
 
@@ -207,6 +221,7 @@ function getAllowedOrigin(requestOrigin: string | undefined): string | null {
   const allowedOrigins = [
     process.env.FRONTEND_URL,
     'http://localhost:5173', // Local dev
+    'http://localhost:5174',
     'http://localhost:3000',
   ].filter(Boolean) as string[];
 

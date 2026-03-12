@@ -9,9 +9,24 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// CORS allowlist (consistent with Vercel handler)
+const ALLOWED_ORIGINS = [
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:3000",
+].filter(Boolean);
+
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (ALLOWED_ORIGINS.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
 }));
 app.use(express.json());
@@ -50,10 +65,11 @@ const EXTRA_TOPPINGS = {
   'bacon': 2.5,
 };
 
-// Rate limiting
+// Rate limiting with periodic cleanup to prevent memory leak
 const rateLimitMap = new Map();
 const RATE_LIMIT_WINDOW_MS = 60000;
 const RATE_LIMIT_MAX_REQUESTS = 10;
+const RATE_LIMIT_CLEANUP_INTERVAL_MS = 300000; // Clean up every 5 minutes
 
 function checkRateLimit(userId) {
   const now = Date.now();
@@ -71,6 +87,16 @@ function checkRateLimit(userId) {
   userLimit.count++;
   return true;
 }
+
+// Periodic cleanup of expired rate limit entries
+setInterval(() => {
+  const now = Date.now();
+  for (const [userId, limit] of rateLimitMap.entries()) {
+    if (now > limit.resetTime) {
+      rateLimitMap.delete(userId);
+    }
+  }
+}, RATE_LIMIT_CLEANUP_INTERVAL_MS);
 
 // Calculate order total server-side
 function calculateOrderTotal(pizzaId, sizeId, extras, quantity) {
@@ -147,6 +173,13 @@ async function getUser(userId) {
       headers: { Authorization: `Bearer ${token}` },
     }
   );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Failed to fetch user:", response.status, errorText);
+    throw new Error(`Failed to fetch user: ${response.status}`);
+  }
+
   return response.json();
 }
 
@@ -164,6 +197,13 @@ async function updateUserMetadata(userId, metadata) {
       body: JSON.stringify({ user_metadata: metadata }),
     }
   );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Failed to update user metadata:", response.status, errorText);
+    throw new Error(`Failed to update user metadata: ${response.status}`);
+  }
+
   return response.json();
 }
 

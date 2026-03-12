@@ -188,9 +188,9 @@ const OrderPage = () => {
                 </button>
                 <span className="qty-value">{quantity}</span>
                 <button
-                  onClick={() => setQuantity(Math.min(10, quantity + 1))}
+                  onClick={() => setQuantity(Math.min(20, quantity + 1))}
                   className="qty-btn"
-                  disabled={quantity >= 10}
+                  disabled={quantity >= 20}
                 >
                   +
                 </button>
