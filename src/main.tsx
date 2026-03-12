@@ -27,7 +27,7 @@ createRoot(document.getElementById("root")!).render(
         }}
         onRedirectCallback={onRedirectCallback}
         useRefreshTokens={true}
-        cacheLocation="localstorage"
+        cacheLocation="memory"
       >
         <App />
       </Auth0Provider>

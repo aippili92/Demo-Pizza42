@@ -11,16 +11,13 @@ import ProfilePage from "./pages/ProfilePage";
 import CallbackPage from "./pages/CallbackPage";
 
 function App() {
-  const { isLoading, error, isAuthenticated, user } = useAuth0();
+  const { isLoading, error } = useAuth0();
 
   useEffect(() => {
     if (error) {
-      console.error("Auth0 Error:", error);
+      console.error("Auth0 Error:", error.message);
     }
-    if (isAuthenticated && user) {
-      console.log("User authenticated:", user);
-    }
-  }, [error, isAuthenticated, user]);
+  }, [error]);
 
   if (error) {
     return (

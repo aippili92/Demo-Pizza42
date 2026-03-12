@@ -32,7 +32,7 @@ const OrderPage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!selectedPizza || !deliveryAddress.trim()) return;
+    if (!selectedPizza || deliveryAddress.trim().length < 10) return;
 
     setIsSubmitting(true);
     setOrderResult(null);
@@ -45,17 +45,15 @@ const OrderPage = () => {
         },
       });
 
+      // Send IDs to server - server calculates total and timestamp
       const orderData = {
         pizza: {
           id: selectedPizza.id,
-          name: selectedPizza.name,
-          size: selectedSize.name,
-          extras: selectedExtras.map((e) => e.name),
+          size: selectedSize.id,
+          extras: selectedExtras.map((e) => e.id),
         },
         quantity,
         deliveryAddress,
-        total: calculateTotal(),
-        orderedAt: new Date().toISOString(),
       };
 
       const response = await fetch(`${getApiUrl()}/orders`, {
@@ -226,13 +224,15 @@ const OrderPage = () => {
               </div>
               <button
                 onClick={handleSubmit}
-                disabled={!deliveryAddress.trim() || !isEmailVerified || isSubmitting}
+                disabled={deliveryAddress.trim().length < 10 || !isEmailVerified || isSubmitting}
                 className="btn btn-primary btn-lg submit-order"
               >
                 {isSubmitting
                   ? "Placing Order..."
                   : !isEmailVerified
                   ? "Verify Email to Order"
+                  : deliveryAddress.trim().length < 10
+                  ? "Enter Address (min 10 chars)"
                   : "Place Order"}
               </button>
             </section>

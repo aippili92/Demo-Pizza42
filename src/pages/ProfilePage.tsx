@@ -119,9 +119,19 @@ const ProfilePage = () => {
       </div>
 
       <div className="profile-section">
-        <h3>ID Token Claims</h3>
+        <h3>ID Token Claims (Demo)</h3>
+        <p className="token-disclaimer">
+          Custom claims from Auth0 that power personalization:
+        </p>
         <div className="token-display">
-          <pre>{JSON.stringify(user, null, 2)}</pre>
+          <pre>{JSON.stringify({
+            // Only show non-sensitive, relevant claims for demo
+            name: user.name,
+            email_verified: user.email_verified,
+            [`${NAMESPACE}/customer_tier`]: customerTier,
+            [`${NAMESPACE}/total_orders`]: totalOrders,
+            [`${NAMESPACE}/order_history`]: `[${orderHistory.length} orders]`,
+          }, null, 2)}</pre>
         </div>
       </div>
     </div>

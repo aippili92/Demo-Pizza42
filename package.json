@@ -5,12 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:all": "npm run dev:backend & npm run dev",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:local": "echo 'Starting backend...' && cd backend && npm run dev &  sleep 2 && echo 'Starting frontend...' && npm run dev"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.15.0",
+    "jose": "^5.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1"
