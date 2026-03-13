@@ -277,11 +277,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method === 'POST') {
-    // Create order - requires create:orders scope
-    if (!hasScope(payload.scope, 'create:orders')) {
+    // Create order - requires place:order scope
+    if (!hasScope(payload.scope, 'place:order')) {
       return res.status(403).json({
         error: 'insufficient_scope',
-        message: 'Token does not have create:orders permission',
+        message: 'Token does not have place:order permission',
       });
     }
 

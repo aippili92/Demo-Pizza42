@@ -41,7 +41,7 @@ const OrderPage = () => {
       const token = await getAccessTokenSilently({
         authorizationParams: {
           audience: authConfig.audience,
-          scope: "create:orders",
+          scope: "place:order",
         },
       });
 

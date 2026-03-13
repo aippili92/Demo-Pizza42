@@ -213,7 +213,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // Create order (protected)
-app.post("/api/orders", checkJwt, requiredScopes("create:orders"), async (req, res) => {
+app.post("/api/orders", checkJwt, requiredScopes("place:order"), async (req, res) => {
   try {
     const userId = req.auth.payload.sub;
 
