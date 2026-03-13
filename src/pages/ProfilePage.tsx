@@ -19,6 +19,10 @@ const ProfilePage = () => {
   // Get custom claims from ID token
   const totalOrders = user[`${NAMESPACE}/total_orders`] as number || 0;
   const customerTier = user[`${NAMESPACE}/customer_tier`] as string || "new";
+  const totalSpend = user[`${NAMESPACE}/total_spend`] as number || 0;
+  const favoritePizza = user[`${NAMESPACE}/favorite_pizza`] as string || null;
+  const lastOrderAt = user[`${NAMESPACE}/last_order_at`] as string || null;
+  const firstOrderAt = user[`${NAMESPACE}/first_order_at`] as string || null;
   const orderHistory = user[`${NAMESPACE}/order_history`] as Array<{
     orderId: string;
     pizza: string | { id: string; name: string; size: string; extras?: string[] };
@@ -32,6 +36,12 @@ const ProfilePage = () => {
     if (!pizza) return "Unknown";
     if (typeof pizza === "string") return pizza;
     return pizza.name || "Unknown";
+  };
+
+  // Format date helper
+  const formatDate = (dateStr: string | null): string => {
+    if (!dateStr) return "N/A";
+    return new Date(dateStr).toLocaleDateString();
   };
 
   return (
@@ -88,6 +98,32 @@ const ProfilePage = () => {
         </div>
       </div>
 
+      <div className="profile-section">
+        <h3>Marketing Insights (from ID Token)</h3>
+        <div className="details-grid">
+          <div className="detail-item">
+            <span className="detail-label">Lifetime Value</span>
+            <span className="detail-value" style={{ color: "#2a9d8f", fontWeight: 600 }}>
+              ${totalSpend.toFixed(2)}
+            </span>
+          </div>
+          <div className="detail-item">
+            <span className="detail-label">Favorite Pizza</span>
+            <span className="detail-value">
+              {favoritePizza ? `🍕 ${favoritePizza}` : "No orders yet"}
+            </span>
+          </div>
+          <div className="detail-item">
+            <span className="detail-label">Last Order</span>
+            <span className="detail-value">{formatDate(lastOrderAt)}</span>
+          </div>
+          <div className="detail-item">
+            <span className="detail-label">Customer Since</span>
+            <span className="detail-value">{formatDate(firstOrderAt)}</span>
+          </div>
+        </div>
+      </div>
+
       {orderHistory.length > 0 && (
         <div className="profile-section">
           <h3>Recent Orders (from ID Token)</h3>
@@ -137,6 +173,10 @@ const ProfilePage = () => {
             email_verified: user.email_verified,
             [`${NAMESPACE}/customer_tier`]: customerTier,
             [`${NAMESPACE}/total_orders`]: totalOrders,
+            [`${NAMESPACE}/total_spend`]: totalSpend,
+            [`${NAMESPACE}/favorite_pizza`]: favoritePizza,
+            [`${NAMESPACE}/last_order_at`]: lastOrderAt,
+            [`${NAMESPACE}/first_order_at`]: firstOrderAt,
             [`${NAMESPACE}/order_history`]: `[${orderHistory.length} orders]`,
           }, null, 2)}</pre>
         </div>
