@@ -23,10 +23,11 @@ createRoot(document.getElementById("root")!).render(
         authorizationParams={{
           redirect_uri: window.location.origin,
           audience: authConfig.audience,
-          scope: "openid profile email create:orders",
+          scope: authConfig.scope,
         }}
         onRedirectCallback={onRedirectCallback}
         useRefreshTokens={true}
+        useRefreshTokensFallback={true}
         cacheLocation="memory"
       >
         <App />
