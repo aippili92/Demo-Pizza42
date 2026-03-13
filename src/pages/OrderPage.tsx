@@ -93,9 +93,11 @@ const OrderPage = () => {
         }
       }
     } catch (error) {
+      console.error("Order error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       setOrderResult({
         success: false,
-        message: "An error occurred. Please try again.",
+        message: `Error: ${errorMessage}`,
       });
     } finally {
       setIsSubmitting(false);
