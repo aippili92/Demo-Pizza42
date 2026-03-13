@@ -211,7 +211,7 @@ function sanitizeDeliveryAddress(address: unknown): string | null {
   const sanitized = address.trim().slice(0, 500);
 
   // Must have some content
-  if (sanitized.length < 10) return null;
+  if (sanitized.length === 0) return null;
 
   return sanitized;
 }
@@ -301,7 +301,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (!sanitizedAddress) {
         return res.status(400).json({
           error: 'invalid_request',
-          message: 'Invalid delivery address. Must be at least 10 characters.',
+          message: 'Delivery address is required.',
         });
       }
 

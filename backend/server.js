@@ -125,7 +125,7 @@ function calculateOrderTotal(pizzaId, sizeId, extras, quantity) {
 function sanitizeDeliveryAddress(address) {
   if (typeof address !== 'string') return null;
   const sanitized = address.trim().slice(0, 500);
-  if (sanitized.length < 10) return null;
+  if (sanitized.length === 0) return null;
   return sanitized;
 }
 
@@ -240,7 +240,7 @@ app.post("/api/orders", checkJwt, requiredScopes("place:order"), async (req, res
     if (!sanitizedAddress) {
       return res.status(400).json({
         error: "invalid_request",
-        message: "Invalid delivery address. Must be at least 10 characters.",
+        message: "Delivery address is required.",
       });
     }
 

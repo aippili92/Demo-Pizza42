@@ -21,11 +21,18 @@ const ProfilePage = () => {
   const customerTier = user[`${NAMESPACE}/customer_tier`] as string || "new";
   const orderHistory = user[`${NAMESPACE}/order_history`] as Array<{
     orderId: string;
-    pizza: string;
+    pizza: string | { id: string; name: string; size: string; extras?: string[] };
     total: number;
     orderedAt: string;
     status: string;
   }> || [];
+
+  // Helper to get pizza name from order (handles both string and object formats)
+  const getPizzaName = (pizza: string | { name: string } | undefined): string => {
+    if (!pizza) return "Unknown";
+    if (typeof pizza === "string") return pizza;
+    return pizza.name || "Unknown";
+  };
 
   return (
     <div className="profile-page">
@@ -87,7 +94,7 @@ const ProfilePage = () => {
           <div className="mini-orders-list">
             {orderHistory.slice(0, 5).map((order) => (
               <div key={order.orderId} className="mini-order-item">
-                <span className="mini-order-pizza">{order.pizza}</span>
+                <span className="mini-order-pizza">{getPizzaName(order.pizza)}</span>
                 <span className="mini-order-total">${order.total?.toFixed(2)}</span>
                 <span className="mini-order-date">
                   {new Date(order.orderedAt).toLocaleDateString()}

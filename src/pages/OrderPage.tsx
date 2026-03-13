@@ -32,7 +32,7 @@ const OrderPage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!selectedPizza || deliveryAddress.trim().length < 10) return;
+    if (!selectedPizza || !deliveryAddress.trim()) return;
 
     setIsSubmitting(true);
     setOrderResult(null);
@@ -226,15 +226,15 @@ const OrderPage = () => {
               </div>
               <button
                 onClick={handleSubmit}
-                disabled={deliveryAddress.trim().length < 10 || !isEmailVerified || isSubmitting}
+                disabled={!deliveryAddress.trim() || !isEmailVerified || isSubmitting}
                 className="btn btn-primary btn-lg submit-order"
               >
                 {isSubmitting
                   ? "Placing Order..."
                   : !isEmailVerified
                   ? "Verify Email to Order"
-                  : deliveryAddress.trim().length < 10
-                  ? "Enter Address (min 10 chars)"
+                  : !deliveryAddress.trim()
+                  ? "Enter Delivery Address"
                   : "Place Order"}
               </button>
             </section>
